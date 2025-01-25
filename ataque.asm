@@ -102,7 +102,17 @@ LoadPalettesLoop:
                         ; if compare was equal to 32, keep going down
 
 
-  
+LoadSprites:
+  LDX #$00              ; start at 0
+LoadSpritesLoop:
+  LDA sprites, x        ; load data from address (sprites +  x)
+  STA $0200, x          ; store into RAM address ($0200 + x)
+  INX                   ; X = X + 1
+  CPX #$20              ; Compare X to hex $20, decimal 32
+  BNE LoadSpritesLoop   ; Branch to LoadSpritesLoop if compare was Not Equal to zero
+                        ; if compare was equal to 32, keep going down
+              
+              
 
 
 ;;;Inicializacion de valores
@@ -274,11 +284,9 @@ CheckPlayer1Collision:
 
   JMP GameEngineDone
  
- 
- 
- 
+
 UpdateSprites:
-  LDA player1y  ;;update all ball sprite info
+  LDA player1y  ;;update all sprite info
   STA $0200
 
   LDA player1x
@@ -337,10 +345,10 @@ palette:
 
 sprites:
      ;vert tile attr horiz
-  .db $80, $32, $00, $80   ;sprite 0
-  .db $80, $33, $00, $88   ;sprite 1
-  .db $88, $34, $00, $80   ;sprite 2
-  .db $88, $35, $00, $88   ;sprite 3
+  .db $80, $00, $00, $80   ;sprite 0
+  .db $80, $01, $00, $88   ;sprite 1
+  .db $88, $10, $00, $80   ;sprite 2
+  .db $88, $11, $00, $88   ;sprite 3
 
 
 
