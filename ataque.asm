@@ -102,17 +102,65 @@ LoadPalettesLoop:
                         ; if compare was equal to 32, keep going down
 
 
-LoadSprites:
+LoadJugadorSprites:
   LDX #$00              ; start at 0
-LoadSpritesLoop:
-  LDA sprites, x        ; load data from address (sprites +  x)
+LoadJugadorSpritesLoop:
+  LDA jugadorSprites, x        ; load data from address (sprites +  x)
   STA $0200, x          ; store into RAM address ($0200 + x)
   INX                   ; X = X + 1
-  CPX #$20              ; Compare X to hex $20, decimal 32
-  BNE LoadSpritesLoop   ; Branch to LoadSpritesLoop if compare was Not Equal to zero
+  CPX #$10              ; Compare X to hex $20, decimal 16
+  BNE LoadJugadorSpritesLoop   ; Branch to LoadSpritesLoop if compare was Not Equal to zero
                         ; if compare was equal to 32, keep going down
 
 
+;; Vamos a tener 4 enemigos en pantalla
+LoadEnemigoSprites1:
+  LDX #$00              ; start at 0
+  LDY #$10
+LoadEnemigoSpritesLoop1:
+  LDA enemigoSprites, x        ; load data from address (sprites +  x)
+  STA $0200, y          ; store into RAM address ($0200 + x)
+  INX                   ; X = X + 1
+  INY                   ; Y = Y + 1
+  CPX #$10              ; Compare X to hex $20, decimal 16
+  BNE LoadEnemigoSpritesLoop1   ; Branch to LoadSpritesLoop if compare was Not Equal to zero
+                        ; if compare was equal to 32, keep going down
+
+LoadEnemigoSprites2:
+  LDX #$00              ; start at 0
+  LDY #$20
+LoadEnemigoSpritesLoop2:
+  LDA enemigoSprites, x        ; load data from address (sprites +  x)
+  STA $0200, y          ; store into RAM address ($0200 + x)
+  INX                   ; X = X + 1
+  INY                   ; Y = Y + 1
+  CPX #$10              ; Compare X to hex $20, decimal 16
+  BNE LoadEnemigoSpritesLoop2   ; Branch to LoadSpritesLoop if compare was Not Equal to zero
+                        ; if compare was equal to 32, keep going down
+
+LoadEnemigoSprites3:
+  LDX #$00              ; start at 0
+  LDY #$30
+LoadEnemigoSpritesLoop3:
+  LDA enemigoSprites, x        ; load data from address (sprites +  x)
+  STA $0200, y          ; store into RAM address ($0200 + x)
+  INX                   ; X = X + 1
+  INY                   ; Y = Y + 1
+  CPX #$10              ; Compare X to hex $20, decimal 16
+  BNE LoadEnemigoSpritesLoop3   ; Branch to LoadSpritesLoop if compare was Not Equal to zero
+                        ; if compare was equal to 32, keep going down
+
+LoadEnemigoSprites4:
+  LDX #$00              ; start at 0
+  LDY #$40
+LoadEnemigoSpritesLoop4:
+  LDA enemigoSprites, x        ; load data from address (sprites +  x)
+  STA $0200, y          ; store into RAM address ($0200 + x)
+  INX                   ; X = X + 1
+  INY                   ; Y = Y + 1
+  CPX #$10              ; Compare X to hex $20, decimal 16
+  BNE LoadEnemigoSpritesLoop4   ; Branch to LoadSpritesLoop if compare was Not Equal to zero
+                        ; if compare was equal to 32, keep going down
 
 
 ;;;Inicializacion de valores
@@ -297,6 +345,10 @@ CheckFirePlayer1:
 
 CheckFirePlayer1Done:
 
+;; Procesar Enemigos
+  JSR UpdateEnemigos
+
+
 CheckPlayer1Collision:
   ;; vamos a tener que recorrer un listado de enemigos
   ;; si alguno colisiona con player1
@@ -311,7 +363,7 @@ UpdateSprites:
 
 UpdatePlayer1Sprites:
 
-LDA player1y  ;;update all sprite info
+  LDA player1y  ;;update all sprite info
   ;; guardamos en la posicion del sprite 0
   STA $0200
   ;; establecemos la posicion del sprite 1, en la misma posicion y que el sprite 0
@@ -342,7 +394,13 @@ DrawScore:
   ;;or using many sprites
   RTS
 
-
+UpdateEnemigos:
+  ;; recorrer la lista de enemigos
+  ;;  mover los enemigos
+  ;;  verificar colisiones
+  ;;  disparar
+  ;;  actualizar sprites
+  RTS
 
 ReadController1:
   LDA #$01
@@ -385,7 +443,7 @@ palette:
   .db $22,$29,$1A,$0F,  $22,$36,$17,$0F,  $22,$30,$21,$0F,  $22,$27,$17,$0F   ;;background palette
   .db $22,$1C,$15,$14,  $22,$02,$38,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C   ;;sprite palette
 
-sprites:
+jugadorSprites:
      ;vert tile attr horiz
   .db $80, $00, $00, $80   ;sprite 0
   .db $80, $01, $00, $88   ;sprite 1
@@ -393,12 +451,28 @@ sprites:
   .db $88, $11, $00, $88   ;sprite 3
 
 tiposEnemigos:
-    ; id    tile1 tile2 tile3 tile4 speed vida  cantTorretas  torr1x  torr1y  torr2x  torr2y
-  .db $00,  $02,  $03,  $12,  $13,   $01, $01,    $01,          $07,    $04,    $00,    $00
-  .db $01,  $04,  $05,  $14,  $15,   $02, $01,    $02,          $02,    $00,    $05,    $00
-  .db $02,  $22,  $23,  $32,  $33,   $01, $01,    $01,          $07,    $00,    $00,    $00
-  .db $03,  $24,  $25,  $34,  $35,   $02, $01,    $01,          $07,    $00,    $00,    $00
+    ; tipo  tile1 tile2 tile3 tile4 speedx  speedy vida  cadencia  cantTorretas  torr1x  torr1y  torr2x  torr2y
+  .db $00,  $02,  $03,  $12,  $13,   $00,   $01,    $01,    $78,      $01,        $07,    $04,    $00,    $00
+  .db $01,  $04,  $05,  $14,  $15,   $01,   $01,    $01,    $50,      $02,        $02,    $00,    $05,    $00
+  .db $02,  $22,  $23,  $32,  $33,   $02,   $01,    $01,    $40,      $01,        $07,    $12,    $00,    $00
+  .db $03,  $24,  $25,  $34,  $35,   $00,   $02,    $01,    $30,      $01,        $07,    $00,    $00,    $00
 
+enemigos:
+  ;; 4 enemigos de tipo 1
+  ;   tipo x    y     vida  ultimodisparo cooldown
+  .db $00, $20, $00,  $00,  $00,            $00 
+  .db $00, $10, $00,  $00,  $00,            $00
+  .db $00, $60, $00,  $00,  $00,            $00
+  .db $00, $80, $00,  $00,  $00,            $00
+
+
+;; Armamos la estructura de los sprites de los enemigos en base a los datos anteriores
+enemigoSprites:
+      ;vert tile attr horiz
+  .db $F0, $22, $00, $10   ;sprite 0
+  .db $F0, $23, $00, $18   ;sprite 1
+  .db $F8, $32, $00, $10   ;sprite 2
+  .db $F8, $33, $00, $18   ;sprite 3
 
 
   .org $FFFA     ;first of the three vectors starts here
