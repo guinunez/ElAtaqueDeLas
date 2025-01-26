@@ -25,6 +25,9 @@ player1speed .rs 1  ; player 1 speed per frame
 player2speed .rs 1  ; player 2 speed per frame
 frameActualFuego .rs 1  ; frame actual de la animacion de fuego
 
+;; RESERVAR ESPACIO PARA LAS VARIABLES DE SONIDO
+isShootPlaying        .rs 1
+isExplosionPlaying    .rs 1
 
 ;; DECLARACION DE CONSTANTES
 STATETITLE     = $00  ; mostrando pantalla de inicio
@@ -190,8 +193,16 @@ Initialize:
   LDA #STATEPLAYING
   STA gamestate
 
+  ;; Sonido
+  LDA #$00
+  STA isShootPlaying
+  STA isExplosionPlaying
 
+  ;; Habilitar canales de sonido
+  lda #%00001111
+  sta $4015 ; enable Square 1, Square 2 y Noise
 
+  ;; NMI
   LDA #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
   STA $2000
 
@@ -199,9 +210,85 @@ Initialize:
   STA $2001
 
 Forever:
+  JSR SoundEngine
   JMP Forever     ;jump back to Forever, infinite loop, waiting for NMI
 
+;; Motor de sonido
+SoundEngine:
+  LDA #$FF
+  CMP isShootPlaying
+  BEQ shootSound
 
+  LDA #$FF
+  CMP isExplosionPlaying
+  BEQ explosionSound
+
+  RTS
+
+;; Sonidos
+; Cuando se necesite reproducir algun sonido solo basta con
+; ejecutar un JSR playShoot ó JSR playExplosion
+playShoot:
+  LDA #$FF
+  STA isShootPlaying
+  RTS
+
+playExplosion:
+  LDA #$FF
+  STA isExplosionPlaying
+  RTS
+
+; Machetes
+;   * Period: the amount of time it takes for a wave to complete one cycle
+shootSound:
+  ; Noise
+  LDA #%00010100  ; --LC VVVV [BITS]
+  STA $400C       ; - L: Envelope loop (on/off),
+                  ; - C: Constant volume (on/off)
+                  ; - V: Volume envelope
+
+  LDA #%00001000        ; L--- PPPP
+  STA $400E       ; - L: Loop noise (on/off),
+                  ; - P: Noise period
+
+  LDA #%00000100  ; LLLL L--- [BITS]
+                  ; - L: Length counter load
+  STA $400F
+
+  ; SQUARE
+  LDA #%00010100  ; Duty 00, Loop off, Volumen 4
+  STA $4000
+
+  LDA #$A6        ; Low 8 bits of period
+  STA $4002       ; 
+
+  LDA #$02        ; Los primeros 5 bits (de izq a derecha) son el volumen
+  STA $4003       ; high 3 bits of period
+                  ; Period: $2A6 : MI OCTAVA 2
+
+  ; Desactivar flag
+  LDA #$00
+  STA isShootPlaying
+  RTS
+
+explosionSound:
+  LDA #%00001111  ; --LC VVVV [BITS]
+  STA $400C       ; - L: Envelope loop (on/off),
+                  ; - C: Constant volume (on/off)
+                  ; - V: Volume envelope
+
+  LDA #$0F        ; L--- PPPP
+  STA $400E       ; - L: Loop noise (on/off),
+                  ; - P: Noise period
+
+  LDA #%00001000  ; LLLL L--- [BITS]
+                  ; - L: Length counter load
+  STA $400F
+  
+  ; Desactivar flag
+  LDA #$00
+  STA isExplosionPlaying
+  RTS
 
 NMI:
   LDA #$00
@@ -437,6 +524,7 @@ FinLoopFuego:
 
 
 FirePlayer1:
+  JSR playShoot
   ;; >> Introducir Disparo aca
   RTS
 
@@ -491,7 +579,7 @@ ReadController2Loop:
   .bank 1
   .org $E000
 palette:
-  .db $22,$29,$1A,$0F,  $22,$36,$17,$0F,  $22,$30,$21,$0F,  $22,$27,$17,$0F   ;;background palette
+  .db $00,$29,$1A,$0F,  $00,$36,$17,$0F,  $00,$30,$21,$0F,  $00,$27,$17,$0F   ;;background palette
   .db $22,$1C,$15,$14,  $22,$02,$38,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C   ;;sprite palette
 
 jugadorSprites:
