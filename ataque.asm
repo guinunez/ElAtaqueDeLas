@@ -470,8 +470,7 @@ UpdatePlayer1Sprites:
   ;; establecemos la posicion del sprite 3, 8 pixeles a la izquierda
   STA $020F
 
-
-;   LDA frameActualFuego
+  INC frameActualFuego
 ;   CMP #$00
 ;   BEQ UpdatePlayer1SpritesFuego0
 
