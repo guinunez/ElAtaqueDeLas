@@ -278,6 +278,24 @@ MovePlayer1Right:
 MovePlayer1RightDone:
 
 ;; Ver si dispara
+CheckFirePlayer1:
+  ;; si el boton de disparo esta presionado
+  ;;  crear una nueva bala
+  LDA buttons1
+  AND #%10000000
+  BEQ CheckFirePlayer1Done
+
+  ;; crear una nueva bala
+  ;;  buscar un slot vacio
+  ;;  si no hay slots vacios, no hacer nada
+  ;;  si hay slots vacios, crear una nueva bala
+  ;;  establecer la posicion de la bala
+  ;;  establecer la direccion de la bala
+  ;;  establecer la velocidad de la bala
+  ;;  establecer el estado de la bala
+  ;;  establecer el tipo de bala
+
+CheckFirePlayer1Done:
 
 CheckPlayer1Collision:
   ;; vamos a tener que recorrer un listado de enemigos
@@ -373,6 +391,13 @@ sprites:
   .db $80, $01, $00, $88   ;sprite 1
   .db $88, $10, $00, $80   ;sprite 2
   .db $88, $11, $00, $88   ;sprite 3
+
+tiposEnemigos:
+    ; id    tile1 tile2 tile3 tile4 speed vida  cantTorretas  torr1x  torr1y  torr2x  torr2y
+  .db $00,  $02,  $03,  $12,  $13,   $01, $01,    $01,          $07,    $04,    $00,    $00
+  .db $01,  $04,  $05,  $14,  $15,   $02, $01,    $02,          $02,    $00,    $05,    $00
+  .db $02,  $22,  $23,  $32,  $33,   $01, $01,    $01,          $07,    $00,    $00,    $00
+  .db $03,  $24,  $25,  $34,  $35,   $02, $01,    $01,          $07,    $00,    $00,    $00
 
 
 
