@@ -443,6 +443,7 @@ CheckPlayer1Collision:
 UpdateSprites:
 
   JSR UpdatePlayer1Sprites
+  RTS
 
 UpdatePlayer1Sprites:
 
@@ -470,31 +471,12 @@ UpdatePlayer1Sprites:
   ;; establecemos la posicion del sprite 3, 8 pixeles a la izquierda
   STA $020F
 
-  INC frameActualFuego
-;   CMP #$00
-;   BEQ UpdatePlayer1SpritesFuego0
 
-;   LDA frameActualFuego
-;   CMP #$01
-;   BEQ UpdatePlayer1SpritesFuego1
 
-;   LDA frameActualFuego
-;   CMP #$02
-;   BEQ UpdatePlayer1SpritesFuego2
 
-; ListoFuego:
-;   LDA frameActualFuego
-;   ;; Incrementar A
-;   CLC
-;   ADC #$01
-
-;   ;; Si es 3, establecemos A en 0
-;   CMP #$03
-;   BEQ ReseteamosFrameActualFuego
-;   STA frameActualFuego
 FinLoopFuego:
   RTS
-  
+
 ; ReseteamosFrameActualFuego:
 ;   LDA #$00
 ;   JMP FinLoopFuego
