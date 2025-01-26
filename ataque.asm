@@ -333,15 +333,7 @@ CheckFirePlayer1:
   AND #%10000000
   BEQ CheckFirePlayer1Done
 
-  ;; crear una nueva bala
-  ;;  buscar un slot vacio
-  ;;  si no hay slots vacios, no hacer nada
-  ;;  si hay slots vacios, crear una nueva bala
-  ;;  establecer la posicion de la bala
-  ;;  establecer la direccion de la bala
-  ;;  establecer la velocidad de la bala
-  ;;  establecer el estado de la bala
-  ;;  establecer el tipo de bala
+  JSR FirePlayer1
 
 CheckFirePlayer1Done:
 
@@ -387,6 +379,10 @@ UpdatePlayer1Sprites:
   ;; establecemos la posicion del sprite 3, 8 pixeles a la izquierda
   STA $020F
 
+  RTS
+
+FirePlayer1:
+  ;; >> Introducir Disparo aca
   RTS
 
 DrawScore:
