@@ -2,7 +2,7 @@
   .ineschr 1   ; 1x  8KB CHR data
   .inesmap 0   ; mapper 0 = NROM, no bank swapping
   .inesmir 1   ; background mirroring
-  
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; EL ATAQUE DE LAS BURBUJAS DEL ESPACIO EXTERIOR   ;;
@@ -11,7 +11,7 @@
 
 ;; DECLARACION DE VARIABLES
   .rsset $0000  ;;start variables at ram location 0
-  
+
 gamestate  .rs 1  ; .rs 1 means reserve one byte of space
 player1x  .rs 1  ; player 1 horizontal position
 player2x  .rs 1  ; player 2 horizontal position
@@ -29,12 +29,12 @@ player2speed .rs 1  ; player 2 speed per frame
 STATETITLE     = $00  ; mostrando pantalla de inicio
 STATEPLAYING   = $01  ; mover las naves y enemigos, verificar colisiones
 STATEGAMEOVER  = $02  ; mostrar pantalla de game over
-  
+
 RIGHTWALL      = $F4  ; Limites de pantalla
 TOPWALL        = $20
 BOTTOMWALL     = $E0
 LEFTWALL       = $04
-  
+
 PLAYER1XINICIAL = $20  ; posicion inicial jugador 1
 PLAYER2XINICIAL = $F8  ; posicion inicial jugador 2
 PLAYER1YINICIAL = $80
@@ -46,7 +46,7 @@ PLAYERVELOCIDADINICIAL = $02  ; velocidad inicial de los jugadores
 
 
   .bank 0
-  .org $C000 
+  .org $C000
 RESET:
   SEI          ; disable IRQs
   CLD          ; disable decimal mode
@@ -76,7 +76,7 @@ clrmem:
   STA $0200, x
   INX
   BNE clrmem
-   
+
 vblankwait2:      ; Second wait for vblank, PPU is ready after this
   BIT $2002
   BPL vblankwait2
@@ -111,15 +111,15 @@ LoadSpritesLoop:
   CPX #$20              ; Compare X to hex $20, decimal 32
   BNE LoadSpritesLoop   ; Branch to LoadSpritesLoop if compare was Not Equal to zero
                         ; if compare was equal to 32, keep going down
-              
-              
+
+
 
 
 ;;;Inicializacion de valores
 Initialize:
   LDA #PLAYER1XINICIAL
   STA player1x
-  
+
   LDA #PLAYER2XINICIAL
   STA player2x
 
@@ -128,7 +128,7 @@ Initialize:
 
   LDA #PLAYER2YINICIAL
   STA player2y
-  
+
   LDA #PLAYERVELOCIDADINICIAL
   STA player1speed
   STA player2speed
@@ -139,7 +139,7 @@ Initialize:
   STA gamestate
 
 
-              
+
   LDA #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
   STA $2000
 
@@ -148,8 +148,8 @@ Initialize:
 
 Forever:
   JMP Forever     ;jump back to Forever, infinite loop, waiting for NMI
-  
- 
+
+
 
 NMI:
   LDA #$00
@@ -167,33 +167,33 @@ NMI:
   LDA #$00        ;;tell the ppu there is no background scrolling
   STA $2005
   STA $2005
-    
+
   ;;;all graphics updates done by here, run game engine
 
 
   JSR ReadController1  ;;get the current button data for player 1
   JSR ReadController2  ;;get the current button data for player 2
-  
-GameEngine:  
+
+GameEngine:
   LDA gamestate
   CMP #STATETITLE
   BEQ EngineTitle    ;;game is displaying title screen
-    
+
   LDA gamestate
   CMP #STATEGAMEOVER
   BEQ EngineGameOver  ;;game is displaying ending screen
-  
+
   LDA gamestate
   CMP #STATEPLAYING
   BEQ EnginePlaying   ;;game is playing
-GameEngineDone:  
-  
+GameEngineDone:
+
   JSR UpdateSprites  ;;set ball/paddle sprites from positions
 
   RTI             ; return from interrupt
- 
+
 ;;;;;;;;
- 
+
 EngineTitle:
   ;;if start button pressed
   ;;  turn screen off
@@ -203,18 +203,18 @@ EngineTitle:
   ;;  turn screen on
   JMP GameEngineDone
 
-;;;;;;;;; 
- 
+;;;;;;;;;
+
 EngineGameOver:
   ;;if start button pressed
   ;;  turn screen off
   ;;  load title screen
   ;;  go to Title State
-  ;;  turn screen on 
+  ;;  turn screen on
   JMP GameEngineDone
- 
+
 ;;;;;;;;;;;
- 
+
 EnginePlaying:
 
 MovePlayer1Up:
@@ -227,11 +227,11 @@ MovePlayer1Up:
   SEC
   SBC player1speed
   STA player1y
-  
+
   JMP MovePlayer1UpDone
 
 MovePlayer1UpDone:
-  
+
 MovePlayer1Down:
   ;;if down button pressed
   LDA buttons1
@@ -242,7 +242,7 @@ MovePlayer1Down:
   CLC
   ADC player1speed
   STA player1y
-  
+
   JMP MovePlayer1DownDone
 
 MovePlayer1DownDone:
@@ -257,7 +257,7 @@ MovePlayer1Left:
   SEC
   SBC player1speed
   STA player1x
-  
+
   JMP MovePlayer1LeftDone
 
 MovePlayer1LeftDone:
@@ -272,7 +272,7 @@ MovePlayer1Right:
   CLC
   ADC player1speed
   STA player1x
-  
+
   JMP MovePlayer1RightDone
 
 MovePlayer1RightDone:
@@ -285,12 +285,15 @@ CheckPlayer1Collision:
 
 
   JMP GameEngineDone
- 
+
 
 UpdateSprites:
 
+  JSR UpdatePlayer1Sprites
 
-  LDA player1y  ;;update all sprite info
+UpdatePlayer1Sprites:
+
+LDA player1y  ;;update all sprite info
   ;; guardamos en la posicion del sprite 0
   STA $0200
   ;; establecemos la posicion del sprite 1, en la misma posicion y que el sprite 0
@@ -314,19 +317,15 @@ UpdateSprites:
   ;; establecemos la posicion del sprite 3, 8 pixeles a la izquierda
   STA $020F
 
-
-  
-  
   RTS
- 
- 
+
 DrawScore:
   ;;draw score on screen using background tiles
   ;;or using many sprites
   RTS
- 
- 
- 
+
+
+
 ReadController1:
   LDA #$01
   STA $4016
@@ -340,7 +339,7 @@ ReadController1Loop:
   DEX
   BNE ReadController1Loop
   RTS
-  
+
 ReadController2:
   LDA #$01
   STA $4016
@@ -353,15 +352,15 @@ ReadController2Loop:
   ROL buttons2     ; bit0 <- Carry
   DEX
   BNE ReadController2Loop
-  RTS  
-  
-  
-    
-        
-;;;;;;;;;;;;;;  
-  
-  
-  
+  RTS
+
+
+
+
+;;;;;;;;;;;;;;
+
+
+
   .bank 1
   .org $E000
 palette:
@@ -378,16 +377,16 @@ sprites:
 
 
   .org $FFFA     ;first of the three vectors starts here
-  .dw NMI        ;when an NMI happens (once per frame if enabled) the 
+  .dw NMI        ;when an NMI happens (once per frame if enabled) the
                    ;processor will jump to the label NMI:
   .dw RESET      ;when the processor first turns on or is reset, it will jump
                    ;to the label RESET:
   .dw 0          ;external interrupt IRQ is not used in this tutorial
-  
-  
-;;;;;;;;;;;;;;  
-  
-  
+
+
+;;;;;;;;;;;;;;
+
+
   .bank 2
   .org $0000
   .incbin "naveggj.chr"   ;includes 8KB graphics file from SMB1
