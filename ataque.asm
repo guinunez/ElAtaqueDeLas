@@ -276,7 +276,9 @@ MovePlayer1Right:
   JMP MovePlayer1RightDone
 
 MovePlayer1RightDone:
-  
+
+;; Ver si dispara
+
 CheckPlayer1Collision:
   ;; vamos a tener que recorrer un listado de enemigos
   ;; si alguno colisiona con player1
@@ -286,11 +288,34 @@ CheckPlayer1Collision:
  
 
 UpdateSprites:
+
+
   LDA player1y  ;;update all sprite info
+  ;; guardamos en la posicion del sprite 0
   STA $0200
+  ;; establecemos la posicion del sprite 1, en la misma posicion y que el sprite 0
+  STA $0204
+  ;; establecemos la posicion del sprite 2, 8 pixeles abajo
+  CLC
+  ADC #$08
+  STA $0208
+  ;; establecemos la posicion del sprite 3, 8 pixeles abajo
+  STA $020C
 
   LDA player1x
+  ;; guardamos en la posicion del sprite 0
   STA $0203
+  ;; establecemos la posicion del sprite 2, en la misma posicion x que el sprite 0
+  STA $020B
+  ;; establecemos la posicion del sprite 1, 8 pixeles a la derecha
+  CLC
+  ADC #$08
+  STA $0207
+  ;; establecemos la posicion del sprite 3, 8 pixeles a la izquierda
+  STA $020F
+
+
+  
   
   RTS
  
