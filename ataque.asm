@@ -23,6 +23,7 @@ score1     .rs 1  ; player 1 score
 score2     .rs 1  ; player 2 score
 player1speed .rs 1  ; player 1 speed per frame
 player2speed .rs 1  ; player 2 speed per frame
+frameActualFuego .rs 1  ; frame actual de la animacion de fuego
 
 
 ;; DECLARACION DE CONSTANTES
@@ -40,7 +41,7 @@ PLAYER2XINICIAL = $F8  ; posicion inicial jugador 2
 PLAYER1YINICIAL = $80
 PLAYER2YINICIAL = $80
 
-PLAYERVELOCIDADINICIAL = $02  ; velocidad inicial de los jugadores
+PLAYERVELOCIDADINICIAL = $01  ; velocidad inicial de los jugadores
 
 ;;;;;;;;;;;;;;;;;;
 
@@ -180,6 +181,9 @@ Initialize:
   LDA #PLAYERVELOCIDADINICIAL
   STA player1speed
   STA player2speed
+
+  LDA #$00
+  STA frameActualFuego
 
 
 ;; Estado inicial del juego, no olvidarse de cambiar a STATETITLE
@@ -379,7 +383,58 @@ UpdatePlayer1Sprites:
   ;; establecemos la posicion del sprite 3, 8 pixeles a la izquierda
   STA $020F
 
+
+;   LDA frameActualFuego
+;   CMP #$00
+;   BEQ UpdatePlayer1SpritesFuego0
+
+;   LDA frameActualFuego
+;   CMP #$01
+;   BEQ UpdatePlayer1SpritesFuego1
+
+;   LDA frameActualFuego
+;   CMP #$02
+;   BEQ UpdatePlayer1SpritesFuego2
+
+; ListoFuego:
+;   LDA frameActualFuego
+;   ;; Incrementar A
+;   CLC
+;   ADC #$01
+
+;   ;; Si es 3, establecemos A en 0
+;   CMP #$03
+;   BEQ ReseteamosFrameActualFuego
+;   STA frameActualFuego
+FinLoopFuego:
   RTS
+  
+; ReseteamosFrameActualFuego:
+;   LDA #$00
+;   JMP FinLoopFuego
+
+; UpdatePlayer1SpritesFuego0:
+;   LDA #$10
+;   STA $0209
+;   LDA #$11
+;   STA $0213
+;   JMP ListoFuego
+
+; UpdatePlayer1SpritesFuego1:
+;   LDA #$20
+;   STA $0209
+;   LDA #$21
+;   STA $0213
+;   JMP ListoFuego
+
+; UpdatePlayer1SpritesFuego2:
+;   LDA #$30
+;   STA $0209
+;   LDA #$31
+;   STA $0213
+;   JMP ListoFuego
+
+
 
 FirePlayer1:
   ;; >> Introducir Disparo aca
