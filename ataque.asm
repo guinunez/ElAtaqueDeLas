@@ -465,10 +465,10 @@ enemigos:
 ;; Armamos la estructura de los sprites de los enemigos en base a los datos anteriores
 enemigoSprites:
       ;vert tile attr horiz
-  .db $F0, $22, $00, $10   ;sprite 0
-  .db $F0, $23, $00, $18   ;sprite 1
-  .db $F8, $32, $00, $10   ;sprite 2
-  .db $F8, $33, $00, $18   ;sprite 3
+  .db $10, $22, $00, $10   ;sprite 0
+  .db $10, $23, $00, $18   ;sprite 1
+  .db $18, $32, $00, $10   ;sprite 2
+  .db $18, $33, $00, $18   ;sprite 3
 
 
   .org $FFFA     ;first of the three vectors starts here
